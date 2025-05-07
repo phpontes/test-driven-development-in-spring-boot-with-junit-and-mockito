@@ -1,7 +1,10 @@
 package com.linkedin.taskmanager.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,5 +31,21 @@ public class TaskRepositoryTest {
         // assert
         assertNotNull(savedTask);
         assertEquals("Test task", savedTask.getTitle());
+    }
+
+    @Test
+    void testDeleteTask() {
+        // arrange
+        Task task = new Task();
+        task.setTitle("Task to delete");
+        task.setStatus("Done");
+        taskRepository.save(task);
+
+        // act
+        taskRepository.delete(task);
+        Optional<Task> deletedTask = taskRepository.findById(task.getId());
+
+        // assert
+        assertFalse(deletedTask.isPresent());
     }
 }
