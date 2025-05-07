@@ -1,7 +1,5 @@
 package com.linkedin.taskmanager.service;
 
-import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 
 import com.linkedin.taskmanager.model.Task;
@@ -15,13 +13,16 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
-    public Task updateTaskStatus(Long id, String status){
-        Optional<Task> taskOptional = taskRepository.findById(id);
-        if (taskOptional.isPresent()) {
-            Task t = taskOptional.get();
-            t.setStatus(status);
-            return taskRepository.save(t);
+    public Task updateTaskStatus(Long id, String status) {
+        Task taskToUpdate = getTaskById(id);
+        if(taskToUpdate == null) {
+            return null;
         }
-        return null;
+        taskToUpdate.setStatus(status);
+        return taskRepository.save(taskToUpdate);
+    }
+
+    public Task getTaskById(Long id) {
+        return taskRepository.findById(id).orElse(null);
     }
 }
