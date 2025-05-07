@@ -1,7 +1,10 @@
 package com.linkedin.taskmanager.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
+import com.linkedin.taskmanager.exception.TaskNotFoundException;
 import com.linkedin.taskmanager.model.Task;
 import com.linkedin.taskmanager.repository.TaskRepository;
 
@@ -13,16 +16,34 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
+    public List<Task> getAllTasks(){
+        return taskRepository.findAll();
+    }
+
+    public Task createTask(Task task) {
+        return taskRepository.save(task);
+    }
+
     public Task updateTaskStatus(Long id, String status) {
         Task taskToUpdate = getTaskById(id);
-        if(taskToUpdate == null) {
-            return null;
-        }
         taskToUpdate.setStatus(status);
         return taskRepository.save(taskToUpdate);
     }
 
     public Task getTaskById(Long id) {
-        return taskRepository.findById(id).orElse(null);
+        return taskRepository.findById(id)
+            .orElseThrow(() -> new TaskNotFoundException("Task not found, id: " + id));
+    }
+
+    public Task updateTask(Long id, Task taskData) {
+        Task existingTask = getTaskById(id);
+        existingTask.setTitle(taskData.getTitle());
+        existingTask.setStatus(taskData.getStatus());
+        return taskRepository.save(existingTask);
+    }
+
+    public void deleteTask(Long id) {
+        Task taskToDelete = getTaskById(id);
+        taskRepository.delete(taskToDelete);
     }
 }
